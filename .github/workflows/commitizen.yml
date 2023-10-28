@@ -5,7 +5,7 @@ on:
 
 jobs:
   commitizen:
-    uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen.yml@v1
+    uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen.yml@v2
     with:
       publish-major-tag: true
     secrets:
