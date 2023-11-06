@@ -39,6 +39,7 @@ Build a container image using Docker and optionally publish it to the repo's con
 | image-name |    no    |  The slugified repository name   |           `my-cool-project`            | The container image name (without the tag).                                                                                      |
 | version    |    no    | The current commit's SHA1 digest |                `1.2.3`                 | The app version. This is used as the container image tag, and is passed an `APP_VERSION` build-arg to the container image build. |
 | context    |    no    |         the Git context          | `./subdir`/`{{defaultContext}}:subdir` | See [docker/build-push-action][context].                                                                                         |
+| target     |    no    |                                  |                 `base`                 | The image stage target to build.                                                                                                 |
 
 ### clean
 

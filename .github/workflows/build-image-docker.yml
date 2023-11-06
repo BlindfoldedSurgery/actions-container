@@ -10,6 +10,9 @@ on:
       push-image:
         type: boolean
         required: true
+      target:
+        type: string
+        required: false
       version:
         type: string
         required: false
@@ -37,3 +40,4 @@ jobs:
             APP_VERSION=${{ inputs.version || github.sha }}
           context: ${{ inputs.context }}
           tags: 'ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ inputs.version || github.sha }}'
+          target: ${{ inputs.target }}
