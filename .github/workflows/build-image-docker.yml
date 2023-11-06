@@ -4,12 +4,12 @@ on:
       context:
         type: string
         required: false
-      push-image:
-        type: boolean
-        required: true
       image-name:
         type: string
         required: false
+      push-image:
+        type: boolean
+        required: true
       version:
         type: string
         required: false
