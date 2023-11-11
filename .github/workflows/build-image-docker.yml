@@ -64,6 +64,7 @@ jobs:
             APP_VERSION=${{ inputs.version || github.sha }}
             ${{ inputs.additional-build-args }}
           context: ${{ inputs.context }}
+          provenance: false
           tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
           target: ${{ inputs.target }}
       - name: Write digest to artifact
