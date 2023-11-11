@@ -15,17 +15,72 @@ accidentally create commits with an unconventional message, install a pre-commit
 
 [ccommit]: https://www.conventionalcommits.org/en/v1.0.0/
 
-## Example
+## Examples
+
+### Build Container and Push on Default Branch
 
 ```yaml
 jobs:
   build-container-image:
-    uses: BlindfoldedSurgery/actions-container/.github/workflows/build-image-docker.yml@v1
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/build-image-docker.yml@v3
     with:
-      push-image: false
+      push-image: ${{ github.ref_name == github.event.repository.default_branch }}
 ```
 
-## Available jobs
+### Multiplatform Build Using Matrix
+
+Matrix job outputs are not usable, so we have to work with a dumb hack here and use artifacts.
+
+```yaml
+jobs:
+  build-images:
+    strategy:
+      matrix:
+        platform: ["arm64", "amd64"]
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/build-image-docker.yml@v3
+    with:
+      digest-artifact-name: digests
+      platform: "linux/${{ matrix.platform }}"
+      push-image: true
+      tag-suffix: -${{ matrix.platform }}
+
+  merge-images:
+    needs: build-images
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/merge-manifests.yml@v3
+    with:
+      variant-digests: digests
+```
+
+### Multiplatform Build Using Separate Jobs
+
+```yaml
+jobs:
+  build-image-arm:
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/merge-manifests.yml@v3
+    with:
+      platform: "linux/arm64"
+      push-image: true
+      tag-suffix: -arm64
+
+  build-image-amd:
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/build-image-docker.yml@v3
+    with:
+      platform: "linux/amd64"
+      push-image: true
+      tag-suffix: -amd64
+
+  merge-images:
+    needs:
+      - build-image-arm
+      - build-image-amd
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/merge-manifests.yml@v3
+    with:
+      variant-digests: |
+        ${{ needs.build-image-arm.outputs.digest }}
+        ${{ needs.build-image-amd.outputs.digest }}
+```
+
+## Available Jobs
 
 ### build-image-docker
 
@@ -46,6 +101,18 @@ Provides the built image's `digest` (`sha256:12345cafe`) as output.
 | context               |    no    |         the Git context          | `./subdir`/`{{defaultContext}}:subdir` | See [docker/build-push-action][context].                                                                                                                                               |
 | target                |    no    |                                  |                 `base`                 | The image stage target to build.                                                                                                                                                       |
 | digest-artifact-name  |    no    |                                  |               `digests`                | If specified, the created digest will be stored in the artifact with the given name. The digest is stored as an empty file with the digest as its name (without the `sha256:` prefix). |
+
+### merge-manifests
+
+Merges a number of already-pushed manifests into one. Useful for multi-architecture image builds.
+
+**Inputs:**
+
+| Name            | Required |             Default              |                     Example                     | Description                                                                                                                                                             |
+|:----------------|:--------:|:--------------------------------:|:-----------------------------------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| variant-digests |   yes    |                                  | `digests` / `sha256:1234cafe\nsha256:4321decaf` | Either the name of an artifact containing digests as files (see `digest-artifact-name` input of `build-image-docker` workflow), or a newline-separated list of digests. |
+| image-name      |    no    |  The slugified repository name   |                `my-cool-project`                | The container image name (without the tag).                                                                                                                             |
+| tag             |    no    | The current commit's SHA1 digest |                     `1.2.3`                     | The container image tag.                                                                                                                                                |
 
 ### clean
 
