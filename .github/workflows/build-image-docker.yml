@@ -7,6 +7,9 @@ on:
       context:
         type: string
         required: false
+      digest-artifact-name:
+        type: string
+        required: false
       image-name:
         type: string
         required: false
@@ -63,3 +66,17 @@ jobs:
           context: ${{ inputs.context }}
           tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
           target: ${{ inputs.target }}
+      - name: Write digest to artifact
+        if: inputs.push-image && inputs.digest-artifact-name
+        run: |
+          digest="${{ steps.build.outputs.digest }}"
+          mkdir digests
+          touch "digests/${digest#sha256:}"
+      - name: Upload digest
+        if: inputs.push-image && inputs.digest-artifact-name
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.digest-artifact-name }}
+          path: digests/*
+          if-no-files-found: error
+          retention-days: 1
