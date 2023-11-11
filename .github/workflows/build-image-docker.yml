@@ -26,10 +26,15 @@ on:
       tag-suffix:
         type: string
         required: false
+    outputs:
+      digest:
+        value: ${{ jobs.build.outputs.digest }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Set up QEMU
         if: inputs.platform != 'linux/amd64'
@@ -48,6 +53,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
       - name: Build container image
+        id: build
         uses: docker/build-push-action@v5
         with:
           push: ${{ inputs.push-image }}

@@ -31,6 +31,8 @@ jobs:
 
 Build a container image using Docker and optionally publish it to the repo's container registry.
 
+Provides the built image's `digest` as output.
+
 **Inputs:**
 
 | Name                  | Required |             Default              |                Example                 | Description                                                                                                                      |
