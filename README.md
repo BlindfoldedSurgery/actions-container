@@ -102,6 +102,32 @@ Provides the built image's `digest` (`sha256:12345cafe`) as output.
 | target                |    no    |                                  |                 `base`                 | The image stage target to build.                                                                                                                                                       |
 | digest-artifact-name  |    no    |                                  |               `digests`                | If specified, the created digest will be stored in the artifact with the given name. The digest is stored as an empty file with the digest as its name (without the `sha256:` prefix). |
 
+### build-image-kaniko
+
+Build a container image using [kaniko][kaniko] and optionally publish it to the repo's container
+registry.
+
+This action is very similar to the one based on Docker, but has two main differences:
+
+- can only build for the platform of the runner machine
+- can build images on a runner without any Docker-in-Docker magic
+
+Provides the built image's `digest` (`sha256:12345cafe`) as output.
+
+**Inputs:**
+
+| Name                  | Required |             Default              |      Example      | Description                                                                                                                                                                            |
+|:----------------------|:--------:|:--------------------------------:|:-----------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| push-image            |   yes    |                                  |  `true`/`false`   | Whether to push the resulting container image to the registry.                                                                                                                         |
+| runner-name-build     |    no    |         `ubuntu-latest`          |  `ubuntu-22.04`   | A GitHub runner label to run the build job on. This can be used to select a machine with a specific architecture.                                                                      |
+| additional-build-args |    no    |                                  |    `key=value`    | Build args that are passed in addition to APP_VERSION                                                                                                                                  |
+| image-name            |    no    |  The slugified repository name   | `my-cool-project` | The container image name (without the tag).                                                                                                                                            |
+| version               |    no    | The current commit's SHA1 digest |      `1.2.3`      | The app version. This is used as the container image tag, and is passed an `APP_VERSION` build-arg to the container image build.                                                       |
+| tag-suffix            |    no    |                                  |     `-arm64`      | Appended to the version as the container image tag. Can be used if multiple variants of the same version are built.                                                                    |
+| context               |    no    |         the Git context          |    `./subdir`     | See [docker/build-push-action][context].                                                                                                                                               |
+| target                |    no    |                                  |      `base`       | The image stage target to build.                                                                                                                                                       |
+| digest-artifact-name  |    no    |                                  |     `digests`     | If specified, the created digest will be stored in the artifact with the given name. The digest is stored as an empty file with the digest as its name (without the `sha256:` prefix). |
+
 ### merge-manifests
 
 Merges a number of already-pushed manifests into one. Useful for multi-architecture image builds.
@@ -129,3 +155,5 @@ Build a container image using Docker and optionally publish it to the repo's con
 [context]: https://github.com/docker/build-push-action#git-context
 
 [continue-on-error]: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontinue-on-error
+
+[kaniko]: https://github.com/GoogleContainerTools/kaniko
