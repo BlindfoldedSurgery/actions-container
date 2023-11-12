@@ -1,0 +1,18 @@
+on:
+  pull_request: {}
+
+jobs:
+  build-no-push:
+    uses: ./.github/workflows/build-image-kaniko.yml
+    with:
+      context: build
+      push-image: false
+
+  build-and-push:
+    uses: ./.github/workflows/build-image-kaniko.yml
+    with:
+      digest-artifact-name: digests
+      additional-build-args: |
+        test=works
+      context: build
+      push-image: true
