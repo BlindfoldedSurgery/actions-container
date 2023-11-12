@@ -1,0 +1,103 @@
+on:
+  workflow_call:
+    inputs:
+      additional-build-args:
+        type: string
+        required: false
+      context:
+        type: string
+        required: false
+        default: .
+      digest-artifact-name:
+        type: string
+        required: false
+      image-name:
+        type: string
+        required: false
+      push-image:
+        type: boolean
+        required: true
+      runner-name-build:
+        type: string
+        required: false
+        default: ubuntu-latest
+      target:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
+      tag-suffix:
+        type: string
+        required: false
+    outputs:
+      digest:
+        value: ${{ jobs.build.outputs.digest }}
+
+jobs:
+  determine-image-name:
+    runs-on: ubuntu-latest
+    outputs:
+      image-name: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+
+  build:
+    needs: determine-image-name
+    runs-on: ubuntu-latest
+    container: gcr.io/kaniko-project/executor:v1.18.0-debug
+    outputs:
+      digest: ${{ steps.digest.outputs.digest }}
+    steps:
+      - name: Set up authentication
+        if: inputs.push-image
+        run: |
+          echo -n "${{ github.repository_owner}}:${{ github.token }}" \
+          | base64 -w0 \
+          | xargs printf '{
+            "auths": {
+              "ghcr.io": {
+                "auth": "%s"
+              }
+            }
+          }' > /kaniko/.docker/config.json
+      - name: Build container image
+        env:
+          # Contrary to kaniko docs, GIT_TOKEN does not work
+          GIT_PASSWORD: ${{ github.token }}
+        run: >
+          additional_args=$(echo -n "${{ inputs.additional-build-args }}" | while read -r arg; do printf '--build-arg "%s" ' "$arg"; done)
+
+          echo "$additional_args" | xargs /kaniko/executor
+          --context "${{ github.repositoryUrl }}#${{ github.sha }}"
+          --context-sub-path "${{ inputs.context }}"
+          --destination "${{ needs.determine-image-name.outputs.image-name }}"
+          --skip-unused-stages
+          --digest-file "/tmp/digest"
+          ${{ inputs.target && format('--target {0}', inputs.target) || '' }} 
+          ${{ !inputs.push-image && '--no-push' || '' }}
+          --build-arg "APP_VERSION='${{ inputs.version || github.sha }}'"
+      - name: Extract digest output
+        id: digest
+        run: |
+          digest=$(cat /tmp/digest)
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+  upload-artifact-digest:
+    runs-on: ubuntu-latest
+    needs: build
+    if: inputs.push-image && inputs.digest-artifact-name
+    steps:
+      - name: Write digest file
+        run: |
+          digest="${{ needs.build.outputs.digest }}"
+          mkdir digests
+          touch "digests/${digest#sha256:}"
+      - name: Upload digest
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.digest-artifact-name }}
+          path: digests/*
+          if-no-files-found: error
+          retention-days: 1
