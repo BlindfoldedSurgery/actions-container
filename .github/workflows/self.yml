@@ -14,6 +14,7 @@ jobs:
     uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen-check.yml@v2
 
   bump:
+    if: github.event_name != 'pull_request'
     uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen-bump.yml@v2
     with:
       publish-major-tag: true
