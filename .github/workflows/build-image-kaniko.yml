@@ -45,7 +45,7 @@ jobs:
 
   build:
     needs: determine-image-name
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner-name-build }}
     container: gcr.io/kaniko-project/executor:v1.18.0-debug
     outputs:
       digest: ${{ steps.digest.outputs.digest }}
