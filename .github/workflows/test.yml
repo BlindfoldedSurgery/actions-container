@@ -15,4 +15,5 @@ jobs:
       additional-build-args: |
         test=works
       context: build
+      runner-name-build: born-bs
       push-image: true
