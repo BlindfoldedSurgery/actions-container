@@ -32,12 +32,20 @@ on:
     outputs:
       digest:
         value: ${{ jobs.build.outputs.digest }}
+      image-name:
+        value: ${{ jobs.build.outputs.image-name }}
+      image-tag:
+        value: ${{ jobs.build.outputs.image-tag }}
+      image-name-with-tag:
+        value: "${{ jobs.build.outputs.image-name }}:${{ jobs.build.outputs.image-tag }}"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
+      image-name: ${{ steps.ids.outputs.image-name }}
+      image-tag: ${{ steps.ids.outputs.image-tag }}
     steps:
       - name: Set up QEMU
         if: inputs.platform != 'linux/amd64'
@@ -59,6 +67,11 @@ jobs:
           password: ${{ github.token }}
       - uses: actions/checkout@v4
         if: inputs.context && !contains(inputs.context, '{{defaultContext}}')
+      - name: Set image name and tag outputs
+        id: ids
+        run: |
+          echo "image-name=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}" >> "$GITHUB_OUTPUT"
+          echo "image-tag=${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}" >> "$GITHUB_OUTPUT"
       - name: Build container image
         id: build
         uses: docker/build-push-action@v5
@@ -70,7 +83,7 @@ jobs:
           context: ${{ inputs.context }}
           platforms: ${{ inputs.platform }}
           provenance: false
-          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
+          tags: "${{ steps.ids.outputs.image-name }}:${{ steps.ids.outputs.image-tag }}"
           target: ${{ inputs.target }}
       - name: Write digest to artifact
         if: inputs.push-image && inputs.digest-artifact-name

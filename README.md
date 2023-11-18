@@ -86,8 +86,6 @@ jobs:
 
 Build a container image using Docker and optionally publish it to the repo's container registry.
 
-Provides the built image's `digest` (`sha256:12345cafe`) as output.
-
 **Inputs:**
 
 | Name                  | Required |             Default              |                Example                 | Description                                                                                                                                                                            |
@@ -102,6 +100,15 @@ Provides the built image's `digest` (`sha256:12345cafe`) as output.
 | target                |    no    |                                  |                 `base`                 | The image stage target to build.                                                                                                                                                       |
 | digest-artifact-name  |    no    |                                  |               `digests`                | If specified, the created digest will be stored in the artifact with the given name. The digest is stored as an empty file with the digest as its name (without the `sha256:` prefix). |
 
+**Outputs:**
+
+|        Name         | Description                            |          Example           |
+|:-------------------:|:---------------------------------------|:--------------------------:|
+|       digest        | The image's digest                     |     `sha256:12345cafe`     |
+|     image-name      | The image's name without the tag       |    `ghcr.io/org/image`     |
+|      image-tag      | The image's tag                        |          `v1.2.3`          |
+| image-name-with-tag | The combined name and tag of the image | `ghcr.io/org/image:v1.2.3` |
+
 ### build-image-kaniko
 
 Build a container image using [kaniko][kaniko] and optionally publish it to the repo's container
@@ -111,8 +118,6 @@ This action is very similar to the one based on Docker, but has two main differe
 
 - can only build for the platform of the runner machine
 - can build images on a runner without any Docker-in-Docker magic
-
-Provides the built image's `digest` (`sha256:12345cafe`) as output.
 
 **Inputs:**
 
@@ -128,6 +133,15 @@ Provides the built image's `digest` (`sha256:12345cafe`) as output.
 | target                |    no    |                                  |      `base`       | The image stage target to build.                                                                                                                                                       |
 | digest-artifact-name  |    no    |                                  |     `digests`     | If specified, the created digest will be stored in the artifact with the given name. The digest is stored as an empty file with the digest as its name (without the `sha256:` prefix). |
 
+**Outputs:**
+
+|        Name         | Description                            |          Example           |
+|:-------------------:|:---------------------------------------|:--------------------------:|
+|       digest        | The image's digest                     |     `sha256:12345cafe`     |
+|     image-name      | The image's name without the tag       |    `ghcr.io/org/image`     |
+|      image-tag      | The image's tag                        |          `v1.2.3`          |
+| image-name-with-tag | The combined name and tag of the image | `ghcr.io/org/image:v1.2.3` |
+
 ### merge-manifests
 
 Merges a number of already-pushed manifests into one. Useful for multi-architecture image builds.
@@ -139,6 +153,14 @@ Merges a number of already-pushed manifests into one. Useful for multi-architect
 | variant-digests |   yes    |                                  | `digests` / `sha256:1234cafe\nsha256:4321decaf` | Either the name of an artifact containing digests as files (see `digest-artifact-name` input of `build-image-docker` workflow), or a newline-separated list of digests. |
 | image-name      |    no    |  The slugified repository name   |                `my-cool-project`                | The container image name (without the tag).                                                                                                                             |
 | tag             |    no    | The current commit's SHA1 digest |                     `1.2.3`                     | The container image tag.                                                                                                                                                |
+
+**Outputs:**
+
+|        Name         | Description                            |          Example           |
+|:-------------------:|:---------------------------------------|:--------------------------:|
+|     image-name      | The image's name without the tag       |    `ghcr.io/org/image`     |
+|      image-tag      | The image's tag                        |          `v1.2.3`          |
+| image-name-with-tag | The combined name and tag of the image | `ghcr.io/org/image:v1.2.3` |
 
 ### clean
 

@@ -13,10 +13,20 @@ on:
       tag:
         type: string
         required: false
+    outputs:
+      image-name:
+        value: ${{ jobs.create.outputs.image-name }}
+      image-tag:
+        value: ${{ jobs.create.outputs.image-tag }}
+      image-name-with-tag:
+        value: "${{ jobs.create.outputs.image-name }}:${{ jobs.create.outputs.image-tag }}"
 
 jobs:
   create:
     runs-on: ubuntu-latest
+    outputs:
+      image-name: ${{ steps.ids.outputs.image-name }}
+      image-tag: ${{ steps.ids.outputs.image-tag }}
     steps:
       - name: Download digest artifacts
         uses: actions/download-artifact@v3
@@ -34,9 +44,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
+      - name: Set image name and tag outputs
+        id: ids
+        run: |
+          echo "image-name=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}" >> "$GITHUB_OUTPUT"
+          echo "image-tag=${{ inputs.tag || github.sha }}" >> "$GITHUB_OUTPUT"
       - name: Create manifest list and push
         run: |
-          name="ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}"
+          name="${{ steps.ids.outputs.image-name }}"
           
           digests=""
           if [ -d /tmp/digests ]
@@ -47,5 +62,5 @@ jobs:
             digests=$(echo -n "${{ inputs.variant-digests }}" | while read -r digest; do printf '%s@%s ' "$name" "$digest"; done)
           fi
           
-          tag="${name}:${{ inputs.tag || github.sha }}"
+          tag="${name}:${{ steps.ids.outputs.image-tag }}"
           docker buildx imagetools create -t "$tag" $digests

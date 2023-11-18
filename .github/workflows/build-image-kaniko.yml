@@ -33,12 +33,19 @@ on:
     outputs:
       digest:
         value: ${{ jobs.build.outputs.digest }}
+      image-name:
+        value: ${{ jobs.determine-image-name.outputs.image-name }}
+      image-tag:
+        value: ${{ jobs.determine-image-name.outputs.image-tag }}
+      image-name-with-tag:
+        value: "${{ jobs.determine-image-name.outputs.image-name }}:${{ jobs.determine-image-name.outputs.image-tag }}"
 
 jobs:
   determine-image-name:
     runs-on: ubuntu-latest
     outputs:
-      image-name: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
+      image-name: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}"
+      image-tag: "${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
     steps:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
@@ -72,7 +79,7 @@ jobs:
           echo "$additional_args" | xargs /kaniko/executor
           --context "${{ github.repositoryUrl }}#${{ github.sha }}"
           --context-sub-path "${{ inputs.context }}"
-          --destination "${{ needs.determine-image-name.outputs.image-name }}"
+          --destination "${{ needs.determine-image-name.outputs.image-name }}:${{ needs.determine-image-name.outputs.image-tag }}"
           --skip-unused-stages
           --digest-file "/tmp/digest"
           ${{ inputs.target && format('--target {0}', inputs.target) || '' }} 
