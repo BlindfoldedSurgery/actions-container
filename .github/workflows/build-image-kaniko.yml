@@ -53,7 +53,7 @@ jobs:
   build:
     needs: determine-image-name
     runs-on: ${{ inputs.runner-name-build }}
-    container: gcr.io/kaniko-project/executor:v1.19.0-debug
+    container: gcr.io/kaniko-project/executor:v1.19.1-debug
     outputs:
       digest: ${{ steps.digest.outputs.digest }}
     steps:
