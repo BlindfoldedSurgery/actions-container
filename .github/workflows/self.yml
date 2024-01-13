@@ -13,14 +13,14 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen-check.yml@v2
     with:
-      python-version: "3.11"
+      python-version: "3.12"
 
   bump:
     if: github.event_name != 'pull_request'
     uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen-bump.yml@v2
     with:
       publish-major-tag: true
-      python-version: "3.11"
+      python-version: "3.12"
     secrets:
       GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
 
