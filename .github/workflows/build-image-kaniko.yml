@@ -4,6 +4,9 @@ on:
       additional-build-args:
         type: string
         required: false
+      containerfile:
+        type: string
+        default: Dockerfile
       context:
         type: string
         required: false
@@ -79,6 +82,7 @@ jobs:
           echo "$additional_args" | xargs /kaniko/executor
           --context "${{ github.repositoryUrl }}#${{ github.sha }}"
           --context-sub-path "${{ inputs.context }}"
+          --dockerfile "${{ inputs.containerfile }}"
           --destination "${{ needs.determine-image-name.outputs.image-name }}:${{ needs.determine-image-name.outputs.image-tag }}"
           --skip-unused-stages
           --digest-file "/tmp/digest"
