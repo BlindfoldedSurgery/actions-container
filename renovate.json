@@ -3,5 +3,34 @@
   "extends": [
     "local>BlindfoldedSurgery/renovate-config",
     ":semanticCommits"
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": [
+        "gcr.io/kaniko-project/executor"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitType": "feat!"
+    },
+    {
+      "matchDepNames": [
+        "gcr.io/kaniko-project/executor"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "semanticCommitType": "feat"
+    },
+    {
+      "matchDepNames": [
+        "gcr.io/kaniko-project/executor"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "semanticCommitType": "fix"
+    }
   ]
 }
