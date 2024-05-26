@@ -32,6 +32,10 @@ on:
       tag-suffix:
         type: string
         required: false
+      timeout-minutes:
+        type: number
+        required: false
+        default: 360
     outputs:
       digest:
         value: ${{ jobs.build.outputs.digest }}
@@ -45,6 +49,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     outputs:
       digest: ${{ steps.build.outputs.digest }}
       image-name: ${{ steps.ids.outputs.image-name }}

@@ -33,6 +33,10 @@ on:
       tag-suffix:
         type: string
         required: false
+      timeout-minutes:
+        type: number
+        required: false
+        default: 360
     outputs:
       digest:
         value: ${{ jobs.build.outputs.digest }}
@@ -57,6 +61,7 @@ jobs:
     needs: determine-image-name
     runs-on: ${{ inputs.runner-name-build }}
     container: gcr.io/kaniko-project/executor:v1.23.0-debug
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     outputs:
       digest: ${{ steps.digest.outputs.digest }}
     steps:
