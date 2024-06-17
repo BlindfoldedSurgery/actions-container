@@ -82,7 +82,7 @@ jobs:
           echo "image-tag=${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}" >> "$GITHUB_OUTPUT"
       - name: Build container image
         id: build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: ${{ inputs.push-image }}
           build-args: |
