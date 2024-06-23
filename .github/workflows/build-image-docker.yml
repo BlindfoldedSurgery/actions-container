@@ -23,6 +23,10 @@ on:
       push-image:
         type: boolean
         required: true
+      summarize-build:
+        type: boolean
+        required: false
+        default: false
       target:
         type: string
         required: false
@@ -83,6 +87,8 @@ jobs:
       - name: Build container image
         id: build
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_NO_SUMMARY: ${{ !inputs.summarize-build }}
         with:
           push: ${{ inputs.push-image }}
           build-args: |

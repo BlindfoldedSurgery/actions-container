@@ -101,6 +101,7 @@ Build a container image using Docker and optionally publish it to the repo's con
 | target                |    no    |                                             |                    `base`                    | The image stage target to build.                                                                                                                                                       |
 | timeout-minutes       |    no    |                    `360`                    |                    `120`                     | The timeout for the build job. See [GitHub Actions docs](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepstimeout-minutes)         |
 | digest-artifact-name  |    no    |                                             |                  `digests`                   | If specified, the created digest will be stored in the artifact with the given name. The digest is stored as an empty file with the digest as its name (without the `sha256:` prefix). |
+| summarize-build       |    no    |                   `false`                   |                `true`/`false`                | Whether to create [build summary](https://docs.docker.com/build/ci/github-actions/build-summary/).                                                                                     |
 
 **Outputs:**
 

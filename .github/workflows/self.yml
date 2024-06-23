@@ -43,6 +43,7 @@ jobs:
         MY_BUILD_ARG_TWO='test2'
       image-name: my-cool-project
       version: "1.2.3"
+      summarize-build: true
       tag-suffix: "-all-options"
       context: "${{ matrix.context }}"
       target: real
