@@ -106,14 +106,16 @@ jobs:
     if: inputs.push-image && inputs.digest-artifact-name
     steps:
       - name: Write digest file
+        id: write-digest
         run: |
           digest="${{ needs.build.outputs.digest }}"
           mkdir digests
           touch "digests/${digest#sha256:}"
+          echo "clean-digest=${digest#sha256:}" >> "$GITHUB_OUTPUT"
       - name: Upload digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.digest-artifact-name }}
+          name: ${{ inputs.digest-artifact-name }}-${{ steps.write-digest.outputs.clean-digest }}
           path: digests/*
           if-no-files-found: error
           retention-days: 1
