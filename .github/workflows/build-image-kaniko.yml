@@ -93,7 +93,7 @@ jobs:
           --digest-file "/tmp/digest"
           ${{ inputs.target && format('--target {0}', inputs.target) || '' }} 
           ${{ !inputs.push-image && '--no-push' || '' }}
-          --build-arg "APP_VERSION='${{ inputs.version || github.sha }}'"
+          --build-arg "APP_VERSION=${{ inputs.version || github.sha }}"
       - name: Extract digest output
         id: digest
         run: |
