@@ -81,6 +81,7 @@ jobs:
         env:
           # Contrary to kaniko docs, GIT_TOKEN does not work
           GIT_PASSWORD: ${{ github.token }}
+          GIT_USERNAME: oauth2
         run: >
           additional_args=$(echo -n "${{ inputs.additional-build-args }}" | while read -r arg; do printf '--build-arg "%s" ' "$arg"; done)
 
