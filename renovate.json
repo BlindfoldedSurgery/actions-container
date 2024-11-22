@@ -31,6 +31,15 @@
         "patch"
       ],
       "semanticCommitType": "fix"
+    },
+    {
+      "matchDepNames": [
+        "rlespinasse/github-slug-action"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessagePrefix": "feat(deps)!:"
     }
   ]
 }
