@@ -15,7 +15,7 @@ on:
 
 jobs:
   clean:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v5
