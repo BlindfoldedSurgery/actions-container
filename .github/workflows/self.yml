@@ -17,12 +17,14 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v2
     with:
+      build-tool: uv
       python-version: "3.13"
 
   bump:
     if: github.event_name != 'pull_request'
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v2
     with:
+      build-tool: uv
       publish-major-tag: true
       python-version: "3.13"
     secrets:
