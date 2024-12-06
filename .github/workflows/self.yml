@@ -9,6 +9,10 @@ on:
       - closed
 
 jobs:
+  required-meta:
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
+    uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v1
+
   check:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v2
