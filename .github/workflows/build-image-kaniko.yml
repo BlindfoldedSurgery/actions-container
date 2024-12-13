@@ -93,13 +93,13 @@ jobs:
           --context "${{ github.repositoryUrl }}#${{ github.sha }}"
           --context-sub-path "${{ inputs.context }}"
           --dockerfile "${{ inputs.containerfile }}"
+          --skip-push-permission-check
           --destination "${{ needs.determine-image-name.outputs.image-name }}:${{ needs.determine-image-name.outputs.image-tag }}"
-          --skip-unused-stages
           --cache=${{ inputs.enable-cache }}
           ${{ (inputs.enable-cache && format('--cache-repo="{0}/layer-cache"', needs.determine-image-name.outputs.image-name)) || '' }}
           --digest-file "/tmp/digest"
           ${{ inputs.target && format('--target {0}', inputs.target) || '' }} 
-          ${{ !inputs.push-image && '--no-push' || '' }}
+          ${{ !inputs.push-image && '--no-push --no-push-cache' || '' }}
           --build-arg "APP_VERSION=${{ inputs.version || github.sha }}"
       - name: Extract digest output
         id: digest
