@@ -93,8 +93,8 @@ jobs:
           --context "${{ github.repositoryUrl }}#${{ github.sha }}"
           --context-sub-path "${{ inputs.context }}"
           --dockerfile "${{ inputs.containerfile }}"
-          --skip-push-permission-check
           --destination "${{ needs.determine-image-name.outputs.image-name }}:${{ needs.determine-image-name.outputs.image-tag }}"
+          --skip-unused-stages
           --cache=${{ inputs.enable-cache }}
           ${{ (inputs.enable-cache && format('--cache-repo="{0}/layer-cache"', needs.determine-image-name.outputs.image-name)) || '' }}
           --digest-file "/tmp/digest"
