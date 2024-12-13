@@ -14,6 +14,10 @@ on:
       digest-artifact-name:
         type: string
         required: false
+      enable-cache:
+        type: boolean
+        required: false
+        default: false
       image-name:
         type: string
         required: false
@@ -91,6 +95,8 @@ jobs:
           --dockerfile "${{ inputs.containerfile }}"
           --destination "${{ needs.determine-image-name.outputs.image-name }}:${{ needs.determine-image-name.outputs.image-tag }}"
           --skip-unused-stages
+          --cache=${{ inputs.enable-cache }}
+          ${{ (inputs.enable-cache && format('--cache-repo="{0}/layer-cache"', needs.determine-image-name.outputs.image-name)) || '' }}
           --digest-file "/tmp/digest"
           ${{ inputs.target && format('--target {0}', inputs.target) || '' }} 
           ${{ !inputs.push-image && '--no-push' || '' }}

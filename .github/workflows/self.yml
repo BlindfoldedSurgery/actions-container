@@ -77,12 +77,20 @@ jobs:
       context: "${{ matrix.context }}"
       target: real
 
+  build-kaniko-minimal-cached:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    uses: ./.github/workflows/build-image-kaniko.yml
+    with:
+      enable-cache: true
+      image-name: pull-request-${{ github.event.pull_request.number }}/cached
+      push-image: true
+
   build-kaniko-amd64:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
       digest-artifact-name: digests
-      image-name: pull-request-${{ github.event.pull_request.number }}
+      image-name: pull-request-${{ github.event.pull_request.number }}/merged
       push-image: true
       tag-suffix: "-amd64"
 
@@ -91,7 +99,7 @@ jobs:
     uses: ./.github/workflows/build-image-docker.yml
     with:
       digest-artifact-name: digests
-      image-name: pull-request-${{ github.event.pull_request.number }}
+      image-name: pull-request-${{ github.event.pull_request.number }}/merged
       platform: linux/arm64
       push-image: true
       tag-suffix: "-amd64"
@@ -101,7 +109,7 @@ jobs:
     needs: [ build-kaniko-amd64, build-docker-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
     with:
-      image-name: pull-request-${{ github.event.pull_request.number }}
+      image-name: pull-request-${{ github.event.pull_request.number }}/merged
       tag: ${{ github.sha }}-merged-with-digests
       variant-digests: digests
 
@@ -110,7 +118,7 @@ jobs:
     needs: [ build-kaniko-amd64, build-docker-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
     with:
-      image-name: pull-request-${{ github.event.pull_request.number }}
+      image-name: pull-request-${{ github.event.pull_request.number }}/merged
       tag: ${{ github.sha }}-merged-with-outputs
       variant-digests: |
         ${{ needs.build-kaniko-amd64.outputs.digest }}
@@ -119,6 +127,10 @@ jobs:
   clean:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     uses: ./.github/workflows/clean.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [ merged, cached, cached/layer-cache ]
     with:
-      image-name: pull-request-${{ github.event.pull_request.number }}
+      image-name: pull-request-${{ github.event.pull_request.number }}/${{ matrix.variant }}
       min-versions-to-keep: 0
