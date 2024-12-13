@@ -50,6 +50,7 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
+      enable-cache: false
       push-image: false
 
   build-kaniko-all-options:
@@ -59,6 +60,7 @@ jobs:
         context: [ "test-build", "./test-build"]
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
+      enable-cache: false
       push-image: false
       additional-build-args: |
         MY_BUILD_ARG_ONE='test'
@@ -81,6 +83,7 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
+      enable-cache: false
       digest-artifact-name: digests
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       push-image: true
@@ -120,6 +123,7 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
+      enable-cache: false
       image-name: pull-request-${{ github.event.pull_request.number }}/for-cleaning
       push-image: true
 
