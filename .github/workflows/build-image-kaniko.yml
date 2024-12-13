@@ -17,7 +17,7 @@ on:
       enable-cache:
         type: boolean
         required: false
-        default: false
+        default: true
       image-name:
         type: string
         required: false
