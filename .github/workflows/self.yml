@@ -139,7 +139,7 @@ jobs:
   clean:
     runs-on: ubuntu-24.04
     # Cleanup workflow isn't triggered in this case
-    if: github.ref_name == 'bump-version'
+    if: github.event_name == 'pull_request' && github.github.head_ref == 'bump-version'
     needs:
       - clean-package-versions
       - merge-with-artifact
