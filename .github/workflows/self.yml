@@ -8,13 +8,13 @@ jobs:
     uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v1
 
   check:
-    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v2
+    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v3
     with:
       build-tool: uv
       python-version: "3.13"
 
   bump:
-    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v2
+    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v3
     with:
       build-tool: uv
       publish-major-tag: true
