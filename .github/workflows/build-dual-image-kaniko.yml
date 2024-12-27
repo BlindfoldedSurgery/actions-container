@@ -1,0 +1,81 @@
+on:
+  workflow_call:
+    inputs:
+      additional-build-args:
+        type: string
+        required: false
+      containerfile:
+        type: string
+        default: Dockerfile
+      context:
+        type: string
+        required: false
+        default: .
+      digest-artifact-name:
+        type: string
+        required: false
+        default: digests
+      enable-cache:
+        type: boolean
+        required: false
+        default: true
+      image-name:
+        type: string
+        required: false
+      push-image:
+        type: boolean
+        required: true
+      arm-runner-name:
+        type: string
+        required: false
+        default: warp-ubuntu-2404-arm64-2x
+      target:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
+      timeout-minutes:
+        type: number
+        required: false
+        default: 360
+    outputs:
+      image-name:
+        value: ${{ jobs.merge-manifests.outputs.image-name }}
+      image-tag:
+        value: ${{ jobs.merge-manifests.outputs.image-tag }}
+      image-name-with-tag:
+        value: ${{ jobs.merge-manifests.outputs.image-name-with-tag }}
+
+jobs:
+  build-container-image:
+    uses: ./.github/workflows/build-image-kaniko.yml
+    strategy:
+      matrix:
+        include:
+          - runner-name: ubuntu-24.04
+            platform: amd64
+          - runner-name: ${{ inputs.arm-runner-name }}
+            platform: arm64
+    with:
+      additional-build-args: ${{ inputs.additional-build-args }}
+      containerfile: ${{ inputs.containerfile }}
+      context: ${{ inputs.context }}
+      enable-cache: ${{ inputs.enable-cache }}
+      image-name: ${{ inputs.image-name }}
+      push-image: ${{ inputs.push-image }}
+      target: ${{ inputs.target }}
+      version: ${{ inputs.version }}
+      tag-suffix: -${{ matrix.platform }}
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      digest-artifact-name: ${{ inputs.digest-artifact-name }}
+      runner-name-build: ${{ matrix.runner-name }}
+
+  merge-manifests:
+    uses: ./.github/workflows/merge-manifests.yml
+    needs: build-container-image
+    if: inputs.push-image
+    with:
+      image-name: ${{ needs.build-container-image.outputs.image-name-without-registry }}
+      tag: ${{ inputs.version }}
+      variant-digests: ${{ inputs.digest-artifact-name }}

@@ -53,6 +53,16 @@ jobs:
       enable-cache: false
       push-image: false
 
+  build-dual-kaniko:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/build-dual-image-kaniko.yml
+    permissions:
+      packages: write
+      contents: read
+    with:
+      image-name: pull-request-${{ github.event.pull_request.number }}/dual
+      push-image: true
+
   build-kaniko-all-options:
     if: github.event_name == 'pull_request'
     strategy:
@@ -84,7 +94,7 @@ jobs:
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
       enable-cache: false
-      digest-artifact-name: digests
+      digest-artifact-name: merge-digests
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       push-image: true
       tag-suffix: "-amd64"
@@ -93,7 +103,7 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-docker.yml
     with:
-      digest-artifact-name: digests
+      digest-artifact-name: merge-digests
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       platform: linux/arm64
       push-image: true
@@ -106,7 +116,7 @@ jobs:
     with:
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       tag: ${{ github.sha }}-merged-with-digests
-      variant-digests: digests
+      variant-digests: merge-digests
 
   merge-with-outputs:
     if: github.event_name == 'pull_request'
@@ -144,13 +154,14 @@ jobs:
       - clean-package-versions
       - merge-with-artifact
       - merge-with-outputs
+      - build-dual-kaniko
       - build-docker-minimal
       - build-kaniko-minimal
       - build-kaniko-minimal-cached
     strategy:
       fail-fast: false
       matrix:
-        variant: [ cached, cached/layer-cache, for-cleaning, merged ]
+        variant: [ cached, cached/layer-cache, dual, for-cleaning, merged ]
     steps:
       - id: encode-name
         run: |

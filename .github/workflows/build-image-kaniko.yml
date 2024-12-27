@@ -44,6 +44,8 @@ on:
     outputs:
       digest:
         value: ${{ jobs.build.outputs.digest }}
+      image-name-without-registry:
+        value: ${{ jobs.determine-image-name.outputs.image-name-without-registry }}
       image-name:
         value: ${{ jobs.determine-image-name.outputs.image-name }}
       image-tag:
@@ -55,6 +57,7 @@ jobs:
   determine-image-name:
     runs-on: ubuntu-24.04
     outputs:
+      image-name-without-registry: "${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}"
       image-name: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}"
       image-tag: "${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}"
     steps:
