@@ -4,6 +4,14 @@ on:
       additional-build-args:
         type: string
         required: false
+      amd-runner-name:
+        type: string
+        required: false
+        default: ubuntu-24.04
+      arm-runner-name:
+        type: string
+        required: false
+        default: warp-ubuntu-2404-arm64-2x
       containerfile:
         type: string
         default: Dockerfile
@@ -25,10 +33,6 @@ on:
       push-image:
         type: boolean
         required: true
-      arm-runner-name:
-        type: string
-        required: false
-        default: warp-ubuntu-2404-arm64-2x
       target:
         type: string
         required: false
@@ -53,7 +57,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner-name: ubuntu-24.04
+          - runner-name: ${{ inputs.amd-runner-name }}
             platform: amd64
           - runner-name: ${{ inputs.arm-runner-name }}
             platform: arm64
