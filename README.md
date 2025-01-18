@@ -56,7 +56,7 @@ jobs:
 ```yaml
 jobs:
   build-image-arm:
-    uses: BlindfoldedSurgery/actions-container/.github/workflows/merge-manifests.yml@v3
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/build-image-docker.yml@v3
     with:
       platform: "linux/arm64"
       push-image: true

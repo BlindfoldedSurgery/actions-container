@@ -19,10 +19,6 @@ on:
         type: string
         required: false
         default: .
-      digest-artifact-name:
-        type: string
-        required: false
-        default: digests
       enable-cache:
         type: boolean
         required: false
@@ -52,15 +48,8 @@ on:
         value: ${{ jobs.merge-manifests.outputs.image-name-with-tag }}
 
 jobs:
-  build-container-image:
+  build-container-image-arm64:
     uses: ./.github/workflows/build-image-kaniko.yml
-    strategy:
-      matrix:
-        include:
-          - runner-name: ${{ inputs.amd-runner-name }}
-            platform: amd64
-          - runner-name: ${{ inputs.arm-runner-name }}
-            platform: arm64
     with:
       additional-build-args: ${{ inputs.additional-build-args }}
       containerfile: ${{ inputs.containerfile }}
@@ -70,16 +59,34 @@ jobs:
       push-image: ${{ inputs.push-image }}
       target: ${{ inputs.target }}
       version: ${{ inputs.version }}
-      tag-suffix: -${{ matrix.platform }}
+      tag-suffix: -arm64
       timeout-minutes: ${{ inputs.timeout-minutes }}
-      digest-artifact-name: ${{ inputs.digest-artifact-name }}
-      runner-name-build: ${{ matrix.runner-name }}
+      runner-name-build: ${{ inputs.arm-runner-name }}
+
+  build-container-image-amd64:
+    uses: ./.github/workflows/build-image-kaniko.yml
+    with:
+      additional-build-args: ${{ inputs.additional-build-args }}
+      containerfile: ${{ inputs.containerfile }}
+      context: ${{ inputs.context }}
+      enable-cache: ${{ inputs.enable-cache }}
+      image-name: ${{ inputs.image-name }}
+      push-image: ${{ inputs.push-image }}
+      target: ${{ inputs.target }}
+      version: ${{ inputs.version }}
+      tag-suffix: -amd64
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      runner-name-build: ${{ inputs.amd-runner-name }}
 
   merge-manifests:
     uses: ./.github/workflows/merge-manifests.yml
-    needs: build-container-image
+    needs:
+      - build-container-image-arm64
+      - build-container-image-amd64
     if: inputs.push-image
     with:
-      image-name: ${{ needs.build-container-image.outputs.image-name-without-registry }}
+      image-name: ${{ needs.build-container-image-arm64.outputs.image-name-without-registry }}
       tag: ${{ inputs.version }}
-      variant-digests: ${{ inputs.digest-artifact-name }}
+      variant-digests: |
+        ${{ needs.build-container-image-arm64.outputs.digest }}
+        ${{ needs.build-container-image-amd64.outputs.digest }}
