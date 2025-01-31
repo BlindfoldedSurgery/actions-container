@@ -11,7 +11,7 @@ on:
       arm-runner-name:
         type: string
         required: false
-        default: warp-ubuntu-2404-arm64-2x
+        default: ubuntu-24.04-arm
       containerfile:
         type: string
         default: Dockerfile
