@@ -23,6 +23,10 @@ on:
         type: boolean
         required: false
         default: true
+      enable-submodules:
+        type: boolean
+        required: false
+        default: false
       image-name:
         type: string
         required: false
@@ -55,6 +59,7 @@ jobs:
       containerfile: ${{ inputs.containerfile }}
       context: ${{ inputs.context }}
       enable-cache: ${{ inputs.enable-cache }}
+      enable-submodules: ${{ inputs.enable-submodules }}
       image-name: ${{ inputs.image-name }}
       push-image: ${{ inputs.push-image }}
       target: ${{ inputs.target }}
@@ -70,6 +75,7 @@ jobs:
       containerfile: ${{ inputs.containerfile }}
       context: ${{ inputs.context }}
       enable-cache: ${{ inputs.enable-cache }}
+      enable-submodules: ${{ inputs.enable-submodules }}
       image-name: ${{ inputs.image-name }}
       push-image: ${{ inputs.push-image }}
       target: ${{ inputs.target }}

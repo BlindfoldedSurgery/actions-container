@@ -18,6 +18,10 @@ on:
         type: boolean
         required: false
         default: true
+      enable-submodules:
+        type: boolean
+        required: false
+        default: false
       image-name:
         type: string
         required: false
@@ -103,6 +107,7 @@ jobs:
           --digest-file "/tmp/digest"
           ${{ inputs.target && format('--target {0}', inputs.target) || '' }} 
           ${{ !inputs.push-image && '--no-push --no-push-cache' || '' }}
+          ${{ inputs.enable-submodules && '--git recurse-submodules=true' || '' }}
           --build-arg "APP_VERSION=${{ inputs.version || github.sha }}"
       - name: Extract digest output
         id: digest
