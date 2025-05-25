@@ -208,7 +208,6 @@ jobs:
       fail-fast: false
       matrix:
         variant:
-          - buildah-amd64
           - buildah-cached
           - buildah-cached/layer-cache
           - cached
