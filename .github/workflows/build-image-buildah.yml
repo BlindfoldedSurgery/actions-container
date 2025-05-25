@@ -1,0 +1,105 @@
+on:
+  workflow_call:
+    inputs:
+      additional-build-args:
+        type: string
+        required: false
+      containerfile:
+        type: string
+        default: Dockerfile
+      context:
+        type: string
+        required: false
+        default: .
+      enable-cache:
+        type: boolean
+        required: false
+        default: true
+      enable-submodules:
+        type: boolean
+        required: false
+        default: false
+      image-name:
+        type: string
+        required: false
+      push-image:
+        type: boolean
+        required: true
+      runner-name-build:
+        type: string
+        required: false
+        default: ubuntu-24.04
+      target:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
+      tag-suffix:
+        type: string
+        required: false
+      timeout-minutes:
+        type: number
+        required: false
+        default: 360
+    outputs:
+      digest:
+        value: ${{ jobs.build.outputs.digest }}
+      image-name-without-registry:
+        value: ${{ jobs.build.outputs.image-name-without-registry }}
+      image-name:
+        value: ${{ jobs.build.outputs.image-name }}
+      image-tag:
+        value: ${{ jobs.build.outputs.image-tag }}
+      image-name-with-tag:
+        value: "${{ jobs.build.outputs.image-name }}:${{ jobs.build.outputs.image-tag }}"
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runner-name-build }}
+    timeout-minutes: ${{ inputs.timeout-minutes }}
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+      image-name-without-registry: ${{ steps.metadata.outputs.image-name-without-registry }}
+      image-name: ${{ steps.metadata.outputs.image-name }}
+      image-tag: ${{ steps.metadata.outputs.image-tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: ${{ inputs.enable-submodules }}
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v5
+      - name: Extract image metadata
+        id: metadata
+        run: |
+          echo 'image-name-without-registry=${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}' >> $GITHUB_OUTPUT
+          echo 'image-name=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}' >> $GITHUB_OUTPUT
+          echo 'image-tag=${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}' >> $GITHUB_OUTPUT
+      - name: Log in to GitHub Container Registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          build-args: |
+            APP_VERSION=${{ inputs.version || github.sha }}
+            ${{ inputs.additional-build-args }}
+          containerfiles: ${{ inputs.context }}/${{ inputs.containerfile }}
+          context: ${{ inputs.context }}
+          extra-args: |
+            ${{ (inputs.enable-cache && format('--cache-from {0}/layer-cache', steps.metadata.outputs.image-name)) || '' }}
+            ${{ (inputs.enable-cache && inputs.push-image && format('--cache-to {0}/layer-cache', steps.metadata.outputs.image-name)) || '' }}
+            ${{ (inputs.target && format('--target {0}', inputs.target)) || '' }}
+          image: "${{ steps.metadata.outputs.image-name }}"
+          layers: true
+          oci: true
+          tags: "${{ steps.metadata.outputs.image-tag }}"
+      - name: Push image
+        if: inputs.push-image
+        id: push
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          tags: "${{ steps.metadata.outputs.image-name }}:${{ steps.metadata.outputs.image-tag }}"

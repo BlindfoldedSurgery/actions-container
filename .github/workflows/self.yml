@@ -99,6 +99,48 @@ jobs:
       push-image: true
       tag-suffix: "-amd64"
 
+  build-buildah-minimal:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      enable-cache: false
+      push-image: false
+
+  build-buildah-all-options:
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        context: [ "test-build", "./test-build"]
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      enable-cache: false
+      push-image: false
+      additional-build-args: |
+        MY_BUILD_ARG_ONE='test'
+        MY_BUILD_ARG_TWO='test2'
+      image-name: my-cool-project
+      version: "1.2.3"
+      tag-suffix: "-all-options"
+      context: "${{ matrix.context }}"
+      target: real
+
+  build-buildah-minimal-cached:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      enable-cache: true
+      image-name: pull-request-${{ github.event.pull_request.number }}/buildah-cached
+      push-image: true
+
+  build-buildah-amd64:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      enable-cache: false
+      image-name: pull-request-${{ github.event.pull_request.number }}/buildah
+      push-image: true
+      tag-suffix: "-amd64"
+
   build-docker-arm64:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-docker.yml
@@ -158,10 +200,12 @@ jobs:
       - build-docker-minimal
       - build-kaniko-minimal
       - build-kaniko-minimal-cached
+      - build-buildah-amd64
+      - build-buildah-minimal-cached
     strategy:
       fail-fast: false
       matrix:
-        variant: [ cached, cached/layer-cache, dual, for-cleaning, merged ]
+        variant: [ cached, cached/layer-cache, dual, for-cleaning, merged, buildah-amd64, buildah-cached, buildah-cached/layer-cache ]
     steps:
       - id: encode-name
         run: |
