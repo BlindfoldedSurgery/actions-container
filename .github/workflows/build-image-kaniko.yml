@@ -28,6 +28,7 @@ on:
       push-image:
         type: boolean
         required: true
+        deprecationMessage: "This action is deprecated in favor of its buildah-based sibling."
       runner-name-build:
         type: string
         required: false
