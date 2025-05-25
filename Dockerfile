@@ -1,6 +1,6 @@
 # This is just a test file for this repo's pipeline
 
-FROM debian:bookworm-slim
+FROM public.ecr.aws/docker/library/debian:bookworm-slim
 
 RUN apt-get update -qq && apt-get install -y --no-install-recommends zip && apt-get clean
 
