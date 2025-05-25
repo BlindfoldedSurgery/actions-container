@@ -214,7 +214,7 @@ jobs:
           - cached/layer-cache
           - dual
           - dual/layer-cache
-          - dual-buidah/layer-cache
+          - dual-buildah/layer-cache
           - dual-buildah
           - for-cleaning
           - merged
