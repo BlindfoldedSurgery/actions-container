@@ -1,0 +1,98 @@
+on:
+  workflow_call:
+    inputs:
+      additional-build-args:
+        type: string
+        required: false
+      amd-runner-name:
+        type: string
+        required: false
+        default: ubuntu-24.04
+      arm-runner-name:
+        type: string
+        required: false
+        default: ubuntu-24.04-arm
+      containerfile:
+        type: string
+        default: Dockerfile
+      context:
+        type: string
+        required: false
+        default: .
+      enable-cache:
+        type: boolean
+        required: false
+        default: true
+      enable-submodules:
+        type: boolean
+        required: false
+        default: false
+      image-name:
+        type: string
+        required: false
+      push-image:
+        type: boolean
+        required: true
+      target:
+        type: string
+        required: false
+      version:
+        type: string
+        required: false
+      timeout-minutes:
+        type: number
+        required: false
+        default: 360
+    outputs:
+      image-name:
+        value: ${{ jobs.merge-manifests.outputs.image-name }}
+      image-tag:
+        value: ${{ jobs.merge-manifests.outputs.image-tag }}
+      image-name-with-tag:
+        value: ${{ jobs.merge-manifests.outputs.image-name-with-tag }}
+
+jobs:
+  build-container-image-arm64:
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      additional-build-args: ${{ inputs.additional-build-args }}
+      containerfile: ${{ inputs.containerfile }}
+      context: ${{ inputs.context }}
+      enable-cache: ${{ inputs.enable-cache }}
+      enable-submodules: ${{ inputs.enable-submodules }}
+      image-name: ${{ inputs.image-name }}
+      push-image: ${{ inputs.push-image }}
+      target: ${{ inputs.target }}
+      version: ${{ inputs.version }}
+      tag-suffix: -arm64
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      runner-name-build: ${{ inputs.arm-runner-name }}
+
+  build-container-image-amd64:
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      additional-build-args: ${{ inputs.additional-build-args }}
+      containerfile: ${{ inputs.containerfile }}
+      context: ${{ inputs.context }}
+      enable-cache: ${{ inputs.enable-cache }}
+      enable-submodules: ${{ inputs.enable-submodules }}
+      image-name: ${{ inputs.image-name }}
+      push-image: ${{ inputs.push-image }}
+      target: ${{ inputs.target }}
+      version: ${{ inputs.version }}
+      tag-suffix: -amd64
+      timeout-minutes: ${{ inputs.timeout-minutes }}
+      runner-name-build: ${{ inputs.amd-runner-name }}
+
+  merge-manifests:
+    uses: ./.github/workflows/merge-manifests.yml
+    needs:
+      - build-container-image-arm64
+      - build-container-image-amd64
+    if: inputs.push-image
+    with:
+      image-name: ${{ needs.build-container-image-arm64.outputs.image-name-without-registry }}
+      tag: ${{ inputs.version }}
+      variant-digests: |
+        ${{ needs.build-container-image-arm64.outputs.digest }}
+        ${{ needs.build-container-image-amd64.outputs.digest }}

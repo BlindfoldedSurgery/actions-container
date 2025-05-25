@@ -133,14 +133,15 @@ jobs:
       image-name: pull-request-${{ github.event.pull_request.number }}/buildah-cached
       push-image: true
 
-  build-buildah-amd64:
+  build-dual-buildah:
     if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/build-image-buildah.yml
+    uses: ./.github/workflows/build-dual-image-buildah.yml
+    permissions:
+      packages: write
+      contents: read
     with:
-      enable-cache: false
-      image-name: pull-request-${{ github.event.pull_request.number }}/buildah
+      image-name: pull-request-${{ github.event.pull_request.number }}/dual-buildah
       push-image: true
-      tag-suffix: "-amd64"
 
   build-docker-arm64:
     if: github.event_name == 'pull_request'
@@ -201,12 +202,23 @@ jobs:
       - build-docker-minimal
       - build-kaniko-minimal
       - build-kaniko-minimal-cached
-      - build-buildah-amd64
+      - build-dual-buildah
       - build-buildah-minimal-cached
     strategy:
       fail-fast: false
       matrix:
-        variant: [ cached, cached/layer-cache, dual, dual/layer-cache, for-cleaning, merged, buildah-amd64, buildah-cached, buildah-cached/layer-cache ]
+        variant:
+          - buildah-amd64
+          - buildah-cached
+          - buildah-cached/layer-cache
+          - cached
+          - cached/layer-cache
+          - dual
+          - dual/layer-cache
+          - dual-buidah/layer-cache
+          - dual-buildah
+          - for-cleaning
+          - merged
     steps:
       - id: encode-name
         run: |
