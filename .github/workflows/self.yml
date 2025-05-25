@@ -109,6 +109,7 @@ jobs:
   build-buildah-all-options:
     if: github.event_name == 'pull_request'
     strategy:
+      fail-fast: false
       matrix:
         context: [ "test-build", "./test-build"]
     uses: ./.github/workflows/build-image-buildah.yml
