@@ -13,6 +13,6 @@ RUN if [ -z "$MY_BUILD_ARG_ONE" ]; then exit 1; fi;
 ARG MY_BUILD_ARG_TWO
 RUN if [ -z "$MY_BUILD_ARG_TWO" ]; then exit 1; fi;
 
-FROM debian:bookworm-slim as fake
+FROM debian:bookworm-slim AS fake
 
 RUN exit 1
