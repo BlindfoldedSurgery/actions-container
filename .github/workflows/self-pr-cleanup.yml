@@ -9,7 +9,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [ cached, cached/layer-cache, dual, for-cleaning, merged ]
+        variant:
+          - buildah-cached
+          - buildah-cached/layer-cache
+          - cached
+          - cached/layer-cache
+          - dual
+          - dual/layer-cache
+          - dual-buildah/layer-cache
+          - dual-buildah
+          - for-cleaning
+          - merged
     steps:
       - id: encode-name
         run: |
