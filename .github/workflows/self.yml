@@ -190,20 +190,32 @@ jobs:
       image-name: pull-request-${{ github.event.pull_request.number }}/for-cleaning
       min-versions-to-keep: 1
 
+  all-checks-passed:
+    runs-on: ubuntu-24.04
+    needs:
+      - merge-with-artifact
+      - merge-with-outputs
+      - build-docker-minimal
+      - build-docker-all-options
+      - build-kaniko-minimal
+      - build-dual-kaniko
+      - build-kaniko-all-options
+      - build-kaniko-minimal-cached
+      - build-dual-buildah
+      - build-buildah-minimal
+      - build-buildah-minimal-cached
+      - build-buildah-all-options
+      - build-kaniko-minimal-for-cleaning
+      - clean-package-versions
+    steps:
+      - run: echo "Done."
+
   clean:
     runs-on: ubuntu-24.04
     # Cleanup workflow isn't triggered in this case
     if: github.event_name == 'pull_request' && github.head_ref == 'bump-version'
     needs:
-      - clean-package-versions
-      - merge-with-artifact
-      - merge-with-outputs
-      - build-dual-kaniko
-      - build-docker-minimal
-      - build-kaniko-minimal
-      - build-kaniko-minimal-cached
-      - build-dual-buildah
-      - build-buildah-minimal-cached
+      - all-checks-passed
     strategy:
       fail-fast: false
       matrix:
