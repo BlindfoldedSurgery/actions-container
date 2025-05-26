@@ -133,6 +133,14 @@ jobs:
       image-name: pull-request-${{ github.event.pull_request.number }}/buildah-cached
       push-image: true
 
+  build-buildah-third-party-arm64:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/build-image-buildah.yml
+    with:
+      image-name: my-cool-project
+      runner-name-build: warp-ubuntu-latest-arm64-2x
+      push-image: false
+
   build-dual-buildah:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-dual-image-buildah.yml
@@ -204,6 +212,7 @@ jobs:
       - build-dual-buildah
       - build-buildah-minimal
       - build-buildah-minimal-cached
+      - build-buildah-third-party-arm64
       - build-buildah-all-options
       - build-kaniko-minimal-for-cleaning
       - clean-package-versions
