@@ -118,8 +118,8 @@ Build a container image using [buildah][buildah] and optionally publish it to th
 registry.
 
 This action is very similar to the ones based on Docker or Kaniko. Unlike Docker, it can only
-build the current runner's platform. Other than Kaniko, it cannot run inside a container. However,
-like Kaniko, it doesn't require a Docker daemon.
+build the current runner's platform. Like Kaniko, it doesn't require a Docker daemon and will work
+on third-party runners. Sadly, for now, it'll run in a privileged container.
 
 **Inputs:**
 
