@@ -4,6 +4,14 @@ on:
       additional-build-args:
         type: string
         required: false
+      amd-runner-name:
+        type: string
+        required: false
+        default: ubuntu-24.04
+      arm-runner-name:
+        type: string
+        required: false
+        default: ubuntu-24.04-arm
       containerfile:
         type: string
         default: Dockerfile
@@ -58,7 +66,7 @@ jobs:
       version: ${{ inputs.version }}
       tag-suffix: -arm64
       timeout-minutes: ${{ inputs.timeout-minutes }}
-      runner-name-build: ubuntu-24.04-arm
+      runner-name-build: ${{ inputs.arm-runner-name }}
 
   build-container-image-amd64:
     uses: ./.github/workflows/build-image-buildah.yml
@@ -74,7 +82,7 @@ jobs:
       version: ${{ inputs.version }}
       tag-suffix: -amd64
       timeout-minutes: ${{ inputs.timeout-minutes }}
-      runner-name-build: ubuntu-24.04
+      runner-name-build: ${{ inputs.amd-runner-name }}
 
   merge-manifests:
     uses: ./.github/workflows/merge-manifests.yml
