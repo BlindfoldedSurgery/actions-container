@@ -21,10 +21,6 @@ on:
       image-name-with-tag:
         value: "${{ jobs.create.outputs.image-name }}:${{ jobs.create.outputs.image-tag }}"
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   create:
     runs-on: ubuntu-24.04
