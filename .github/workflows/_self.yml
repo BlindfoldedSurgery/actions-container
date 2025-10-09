@@ -50,8 +50,8 @@ jobs:
     with:
       push-image: false
       additional-build-args: |
-        MY_BUILD_ARG_ONE='test'
-        MY_BUILD_ARG_TWO='test2'
+        MY_BUILD_ARG_ONE=test
+        MY_BUILD_ARG_TWO=test2
       image-name: my-cool-project
       version: "1.2.3"
       summarize-build: true
@@ -86,8 +86,8 @@ jobs:
       enable-cache: false
       push-image: false
       additional-build-args: |
-        MY_BUILD_ARG_ONE='test'
-        MY_BUILD_ARG_TWO='test2'
+        MY_BUILD_ARG_ONE=test
+        MY_BUILD_ARG_TWO=test2
       image-name: my-cool-project
       version: "1.2.3"
       tag-suffix: "-all-options"
@@ -136,8 +136,8 @@ jobs:
       enable-cache: false
       push-image: false
       additional-build-args: |
-        MY_BUILD_ARG_ONE='test'
-        MY_BUILD_ARG_TWO='test2'
+        MY_BUILD_ARG_ONE=test
+        MY_BUILD_ARG_TWO=test2
       image-name: my-cool-project
       version: "1.2.3"
       tag-suffix: "-all-options"
