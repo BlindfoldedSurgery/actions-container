@@ -3,6 +3,10 @@ on:
     types:
       - closed
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   clean:
     runs-on: ubuntu-24.04

@@ -3,18 +3,31 @@ on:
     branches: [ main ]
   pull_request: {}
 
+permissions:
+  contents: read
+
 jobs:
   required-meta:
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
     uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v1
 
   check:
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v4
+    permissions:
+      contents: read
+      pull-requests: write
     with:
       build-tool: uv
       python-version: "3.13"
 
   bump:
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v4
+    permissions:
+      contents: write
+      pull-requests: write
     with:
       build-tool: uv
       publish-major-tag: true
@@ -84,6 +97,9 @@ jobs:
   build-kaniko-minimal-cached:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       enable-cache: true
       image-name: pull-request-${{ github.event.pull_request.number }}/cached
@@ -92,6 +108,9 @@ jobs:
   build-kaniko-amd64:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       enable-cache: false
       digest-artifact-name: merge-digests
@@ -128,6 +147,9 @@ jobs:
   build-buildah-minimal-cached:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-buildah.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       enable-cache: true
       image-name: pull-request-${{ github.event.pull_request.number }}/buildah-cached
@@ -145,8 +167,8 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-dual-image-buildah.yml
     permissions:
-      packages: write
       contents: read
+      packages: write
     with:
       image-name: pull-request-${{ github.event.pull_request.number }}/dual-buildah
       push-image: true
@@ -154,6 +176,9 @@ jobs:
   build-docker-arm64:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-docker.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       digest-artifact-name: merge-digests
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
@@ -165,6 +190,9 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [ build-kaniko-amd64, build-docker-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       tag: ${{ github.sha }}-merged-with-digests
@@ -174,6 +202,9 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [ build-kaniko-amd64, build-docker-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       tag: ${{ github.sha }}-merged-with-outputs
@@ -184,6 +215,9 @@ jobs:
   build-kaniko-minimal-for-cleaning:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       enable-cache: false
       image-name: pull-request-${{ github.event.pull_request.number }}/for-cleaning
@@ -194,6 +228,9 @@ jobs:
     needs:
       - build-kaniko-minimal-for-cleaning
     uses: ./.github/workflows/clean.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       image-name: pull-request-${{ github.event.pull_request.number }}/for-cleaning
       min-versions-to-keep: 1
@@ -223,6 +260,9 @@ jobs:
     runs-on: ubuntu-24.04
     # Cleanup workflow isn't triggered in this case
     if: github.event_name == 'pull_request' && github.head_ref == 'bump-version'
+    permissions:
+      contents: read
+      packages: write
     needs:
       - all-checks-passed
     strategy:
