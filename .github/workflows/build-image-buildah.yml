@@ -78,6 +78,7 @@ jobs:
       - name: Extract image metadata
         id: metadata
         run: |
+          # shellcheck disable=SC2129
           echo 'image-name-without-registry=${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}' >> "$GITHUB_OUTPUT"
           echo 'image-name=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}' >> "$GITHUB_OUTPUT"
           echo 'image-tag=${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}' >> "$GITHUB_OUTPUT"

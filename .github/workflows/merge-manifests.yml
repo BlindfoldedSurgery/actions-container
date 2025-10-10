@@ -64,4 +64,5 @@ jobs:
           fi
           
           tag="${name}:${{ steps.ids.outputs.image-tag }}"
+          # shellcheck disable=SC2086 # we want word splitting here
           docker buildx imagetools create -t "$tag" $digests
