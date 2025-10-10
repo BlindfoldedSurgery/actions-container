@@ -89,23 +89,22 @@ jobs:
           password: ${{ github.token }}
           auth_file_path: /run/containers/0/auth.json
       - name: Build container image
-        uses: redhat-actions/buildah-build@v2
         env:
           BUILDAH_ISOLATION: chroot
-        with:
-          build-args: |
-            APP_VERSION=${{ inputs.version || github.sha }}
-            ${{ inputs.additional-build-args }}
-          containerfiles: ${{ inputs.context }}/${{ inputs.containerfile }}
-          context: ${{ inputs.context }}
-          extra-args: |
-            ${{ (inputs.enable-cache && format('--cache-from {0}/layer-cache', steps.metadata.outputs.image-name)) || '' }}
-            ${{ (inputs.enable-cache && inputs.push-image && format('--cache-to {0}/layer-cache', steps.metadata.outputs.image-name)) || '' }}
-            ${{ (inputs.target && format('--target {0}', inputs.target)) || '' }}
-          image: "${{ steps.metadata.outputs.image-name }}"
-          layers: true
-          oci: true
-          tags: "${{ steps.metadata.outputs.image-tag }}"
+          ADDITIONAL_BUILD_ARGS: ${{ inputs.additional-build-args }}
+          APP_VERSION: ${{ inputs.version || github.sha }}
+        run: |
+          echo "APP_VERSION=$APP_VERSION" > buildargs.conf
+          echo "$ADDITIONAL_BUILD_ARGS" >> buildargs.conf
+          buildah bud \
+            --format oci --tls-verify=true --layers=true \
+            --build-arg-file buildargs.conf \
+            ${{ (inputs.enable-cache && format('--cache-from={0}/layer-cache', steps.metadata.outputs.image-name)) || '' }} \
+            ${{ (inputs.enable-cache && inputs.push-image && format('--cache-to={0}/layer-cache', steps.metadata.outputs.image-name)) || '' }} \
+            ${{ (inputs.target && format('--target={0}', inputs.target)) || '' }} \
+            -t ${{ format('{0}:{1}', steps.metadata.outputs.image-name, steps.metadata.outputs.image-tag) }} \
+            -f ${{ inputs.context }}/${{ inputs.containerfile }} \
+            ${{ inputs.context }}
       - name: Push image
         if: inputs.push-image
         id: push
