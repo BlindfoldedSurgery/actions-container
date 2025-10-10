@@ -1,11 +1,16 @@
 on:
+  workflow_dispatch:
+    inputs:
+      pull-request-number:
+        type: number
+        description: The number of your PR
+        required: true
   pull_request:
     types:
       - closed
 
 permissions:
-  contents: read
-  packages: write
+  contents: none
 
 jobs:
   clean:
@@ -24,10 +29,12 @@ jobs:
           - dual-buildah
           - for-cleaning
           - merged
+    env:
+      PR_NUMBER: ${{ inputs.pull-request-number || github.event.pull_request.number }}
     steps:
       - id: encode-name
         run: |
-          PACKAGE_NAME="pull-request-${{ github.event.pull_request.number }}/${{ matrix.variant }}"
+          PACKAGE_NAME="pull-request-${PR_NUMBER}/${{ matrix.variant }}"
           # Poor man's urlencode
           ENCODED="${PACKAGE_NAME//\//%2F}"
           echo "package-name=${ENCODED}" >> "$GITHUB_OUTPUT"
