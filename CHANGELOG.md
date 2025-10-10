@@ -1,3 +1,9 @@
+## v7.4.4 (2025-10-10)
+
+### Fix
+
+- implement buildah build manually
+
 ## v7.4.3 (2025-10-10)
 
 ### Fix
