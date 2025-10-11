@@ -21,7 +21,7 @@ jobs:
       pull-requests: write
     with:
       build-tool: uv
-      python-version: "3.13"
+      python-version: "3.14"
 
   bump:
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v4
@@ -31,7 +31,7 @@ jobs:
     with:
       build-tool: uv
       publish-major-tag: true
-      python-version: "3.13"
+      python-version: "3.14"
     secrets:
       GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
 
