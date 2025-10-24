@@ -110,7 +110,7 @@ jobs:
           echo "clean-digest=${digest#sha256:}" >> "$GITHUB_OUTPUT"
       - name: Upload digest
         if: inputs.push-image && inputs.digest-artifact-name
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ inputs.digest-artifact-name }}-${{ steps.write-digest.outputs.clean-digest }}
           path: digests/*
