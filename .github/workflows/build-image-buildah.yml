@@ -67,7 +67,7 @@ jobs:
       image-name: ${{ steps.metadata.outputs.image-name }}
       image-tag: ${{ steps.metadata.outputs.image-tag }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           submodules: ${{ inputs.enable-submodules }}
       - name: Create empty Docker config
