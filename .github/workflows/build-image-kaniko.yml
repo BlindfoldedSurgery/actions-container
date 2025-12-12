@@ -128,7 +128,7 @@ jobs:
           touch "digests/${digest#sha256:}"
           echo "clean-digest=${digest#sha256:}" >> "$GITHUB_OUTPUT"
       - name: Upload digest
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.digest-artifact-name }}-${{ steps.write-digest.outputs.clean-digest }}
           path: digests/*
