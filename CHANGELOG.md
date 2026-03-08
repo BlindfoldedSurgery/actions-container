@@ -1,3 +1,11 @@
+## v8.0.0 (2026-03-08)
+
+### BREAKING CHANGE
+
+- The `merge-manifests` action no longer supports passing an artifact name
+as its variant-digests input.
+- Docker and kaniko support was removed. Use buildah.
+
 ## v7.4.4 (2025-10-10)
 
 ### Fix
