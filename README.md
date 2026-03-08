@@ -79,11 +79,11 @@ Merges a number of already-pushed manifests into one. Useful for multi-architect
 
 **Inputs:**
 
-| Name            | Required |             Default              |                     Example                     | Description                                                                                                                                                             |
-|:----------------|:--------:|:--------------------------------:|:-----------------------------------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| variant-digests |   yes    |                                  | `digests` / `sha256:1234cafe\nsha256:4321decaf` | Either the name of an artifact containing digests as files (see `digest-artifact-name` input of `build-image-docker` workflow), or a newline-separated list of digests. |
-| image-name      |    no    |  The slugified repository name   |                `my-cool-project`                | The container image name (without the tag).                                                                                                                             |
-| tag             |    no    | The current commit's SHA1 digest |                     `1.2.3`                     | The container image tag.                                                                                                                                                |
+| Name            | Required |             Default              |               Example               | Description                                 |
+|:----------------|:--------:|:--------------------------------:|:-----------------------------------:|---------------------------------------------|
+| variant-digests |   yes    |                                  | `sha256:1234cafe\nsha256:4321decaf` | A newline-separated list of digests.        |
+| image-name      |    no    |  The slugified repository name   |          `my-cool-project`          | The container image name (without the tag). |
+| tag             |    no    | The current commit's SHA1 digest |               `1.2.3`               | The container image tag.                    |
 
 **Outputs:**
 
