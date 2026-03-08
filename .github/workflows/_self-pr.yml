@@ -207,7 +207,7 @@ jobs:
       min-versions-to-keep: 1
 
   all-checks-passed:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     needs:
       - merge-with-artifact
       - merge-with-outputs
@@ -228,7 +228,7 @@ jobs:
       - run: echo "Done."
 
   clean:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     # Cleanup workflow isn't triggered in this case
     if: github.head_ref == 'bump-version'
     permissions:
