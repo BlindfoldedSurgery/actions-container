@@ -5,8 +5,7 @@ on:
         type: string
         required: true
         description: > 
-          Newline-separated list of image digests. 
-          If this is only one line, it's interpreted as an artifact name to download.
+          Newline-separated list of image digests.
       image-name:
         type: string
         required: false
@@ -28,13 +27,6 @@ jobs:
       image-name: ${{ steps.ids.outputs.image-name }}
       image-tag: ${{ steps.ids.outputs.image-tag }}
     steps:
-      - name: Download digest artifacts
-        uses: actions/download-artifact@v7
-        if: "!contains(inputs.variant-digests, '\n')"
-        with:
-          pattern: ${{ inputs.variant-digests }}-*
-          path: /tmp/digests
-          merge-multiple: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Inject slug/short variables
@@ -53,16 +45,9 @@ jobs:
       - name: Create manifest list and push
         run: |
           name="${{ steps.ids.outputs.image-name }}"
-          
-          digests=""
-          if [ -d /tmp/digests ]
-          then
-            cd /tmp/digests
-            digests=$(printf "${name}@sha256:%s " *)
-          else
-            digests=$(echo -n "${{ inputs.variant-digests }}" | while read -r digest; do printf '%s@%s ' "$name" "$digest"; done)
-          fi
-          
+
+          digests=$(echo -n "${{ inputs.variant-digests }}" | while read -r digest; do printf '%s@%s ' "$name" "$digest"; done)
+         
           tag="${name}:${{ steps.ids.outputs.image-tag }}"
           # shellcheck disable=SC2086 # we want word splitting here
           docker buildx imagetools create -t "$tag" $digests
