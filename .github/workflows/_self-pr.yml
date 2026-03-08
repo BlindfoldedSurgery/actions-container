@@ -23,82 +23,6 @@ jobs:
       build-tool: uv
       python-version: "3.14"
 
-  build-docker-minimal:
-    uses: ./.github/workflows/build-image-docker.yml
-    with:
-      push-image: false
-
-  build-docker-all-options:
-    strategy:
-      matrix:
-        context: ["{{defaultContext}}:test-build", "test-build", "./test-build"]
-    uses: ./.github/workflows/build-image-docker.yml
-    with:
-      push-image: false
-      additional-build-args: |
-        MY_BUILD_ARG_ONE=test
-        MY_BUILD_ARG_TWO=test2
-      image-name: my-cool-project
-      version: "1.2.3"
-      summarize-build: true
-      tag-suffix: "-all-options"
-      context: "${{ matrix.context }}"
-      target: real
-
-  build-kaniko-minimal:
-    uses: ./.github/workflows/build-image-kaniko.yml
-    with:
-      enable-cache: false
-      push-image: false
-
-  build-dual-kaniko:
-    uses: ./.github/workflows/build-dual-image-kaniko.yml
-    permissions:
-      packages: write
-      contents: read
-    with:
-      image-name: pull-request-${{ github.event.pull_request.number }}/dual
-      push-image: true
-
-  build-kaniko-all-options:
-    strategy:
-      matrix:
-        context: [ "test-build", "./test-build"]
-    uses: ./.github/workflows/build-image-kaniko.yml
-    with:
-      enable-cache: false
-      push-image: false
-      additional-build-args: |
-        MY_BUILD_ARG_ONE=test
-        MY_BUILD_ARG_TWO=test2
-      image-name: my-cool-project
-      version: "1.2.3"
-      tag-suffix: "-all-options"
-      context: "${{ matrix.context }}"
-      target: real
-
-  build-kaniko-minimal-cached:
-    uses: ./.github/workflows/build-image-kaniko.yml
-    permissions:
-      contents: read
-      packages: write
-    with:
-      enable-cache: true
-      image-name: pull-request-${{ github.event.pull_request.number }}/cached
-      push-image: true
-
-  build-kaniko-amd64:
-    uses: ./.github/workflows/build-image-kaniko.yml
-    permissions:
-      contents: read
-      packages: write
-    with:
-      enable-cache: false
-      digest-artifact-name: merge-digests
-      image-name: pull-request-${{ github.event.pull_request.number }}/merged
-      push-image: true
-      tag-suffix: "-amd64"
-
   build-buildah-minimal:
     uses: ./.github/workflows/build-image-buildah.yml
     with:
@@ -149,31 +73,30 @@ jobs:
       image-name: pull-request-${{ github.event.pull_request.number }}/dual-buildah
       push-image: true
 
-  build-docker-arm64:
-    uses: ./.github/workflows/build-image-docker.yml
+  build-buildah-amd64:
+    uses: ./.github/workflows/build-image-buildah.yml
     permissions:
       contents: read
       packages: write
     with:
-      digest-artifact-name: merge-digests
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
-      platform: linux/arm64
+      enable-cache: false
       push-image: true
-      tag-suffix: "-amd64"
+      runner-name-build: ubuntu-24.04
 
-  merge-with-artifact:
-    needs: [ build-kaniko-amd64, build-docker-arm64 ]
-    uses: ./.github/workflows/merge-manifests.yml
+  build-buildah-arm64:
+    uses: ./.github/workflows/build-image-buildah.yml
     permissions:
       contents: read
       packages: write
     with:
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
-      tag: ${{ github.sha }}-merged-with-digests
-      variant-digests: merge-digests
+      enable-cache: false
+      push-image: true
+      runner-name-build: ubuntu-24.04-arm
 
   merge-with-outputs:
-    needs: [ build-kaniko-amd64, build-docker-arm64 ]
+    needs: [ build-buildah-amd64, build-buildah-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
     permissions:
       contents: read
@@ -182,11 +105,11 @@ jobs:
       image-name: pull-request-${{ github.event.pull_request.number }}/merged
       tag: ${{ github.sha }}-merged-with-outputs
       variant-digests: |
-        ${{ needs.build-kaniko-amd64.outputs.digest }}
-        ${{ needs.build-docker-arm64.outputs.digest }}
+        ${{ needs.build-buildah-amd64.outputs.digest }}
+        ${{ needs.build-buildah-arm64.outputs.digest }}
 
-  build-kaniko-minimal-for-cleaning:
-    uses: ./.github/workflows/build-image-kaniko.yml
+  build-minimal-for-cleaning:
+    uses: ./.github/workflows/build-image-buildah.yml
     permissions:
       contents: read
       packages: write
@@ -197,7 +120,7 @@ jobs:
 
   clean-package-versions:
     needs:
-      - build-kaniko-minimal-for-cleaning
+      - build-minimal-for-cleaning
     uses: ./.github/workflows/clean.yml
     permissions:
       contents: read
@@ -209,20 +132,12 @@ jobs:
   all-checks-passed:
     runs-on: ubuntu-slim
     needs:
-      - merge-with-artifact
       - merge-with-outputs
-      - build-docker-minimal
-      - build-docker-all-options
-      - build-kaniko-minimal
-      - build-dual-kaniko
-      - build-kaniko-all-options
-      - build-kaniko-minimal-cached
       - build-dual-buildah
       - build-buildah-minimal
       - build-buildah-minimal-cached
       - build-buildah-third-party-arm64
       - build-buildah-all-options
-      - build-kaniko-minimal-for-cleaning
       - clean-package-versions
     steps:
       - run: echo "Done."
@@ -242,10 +157,6 @@ jobs:
         variant:
           - buildah-cached
           - buildah-cached/layer-cache
-          - cached
-          - cached/layer-cache
-          - dual
-          - dual/layer-cache
           - dual-buildah/layer-cache
           - dual-buildah
           - for-cleaning
