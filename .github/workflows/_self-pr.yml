@@ -1,6 +1,4 @@
 on:
-  push:
-    branches: [ main ]
   pull_request: {}
 
 permissions:
@@ -23,26 +21,12 @@ jobs:
       build-tool: uv
       python-version: "3.14"
 
-  bump:
-    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v5
-    permissions:
-      contents: write
-      pull-requests: write
-    with:
-      build-tool: uv
-      publish-major-tag: true
-      python-version: "3.14"
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
-
   build-docker-minimal:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-docker.yml
     with:
       push-image: false
 
   build-docker-all-options:
-    if: github.event_name == 'pull_request'
     strategy:
       matrix:
         context: ["{{defaultContext}}:test-build", "test-build", "./test-build"]
@@ -60,14 +44,12 @@ jobs:
       target: real
 
   build-kaniko-minimal:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     with:
       enable-cache: false
       push-image: false
 
   build-dual-kaniko:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-dual-image-kaniko.yml
     permissions:
       packages: write
@@ -77,7 +59,6 @@ jobs:
       push-image: true
 
   build-kaniko-all-options:
-    if: github.event_name == 'pull_request'
     strategy:
       matrix:
         context: [ "test-build", "./test-build"]
@@ -95,7 +76,6 @@ jobs:
       target: real
 
   build-kaniko-minimal-cached:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     permissions:
       contents: read
@@ -106,7 +86,6 @@ jobs:
       push-image: true
 
   build-kaniko-amd64:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     permissions:
       contents: read
@@ -119,14 +98,12 @@ jobs:
       tag-suffix: "-amd64"
 
   build-buildah-minimal:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-buildah.yml
     with:
       enable-cache: false
       push-image: false
 
   build-buildah-all-options:
-    if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
       matrix:
@@ -145,7 +122,6 @@ jobs:
       target: real
 
   build-buildah-minimal-cached:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-buildah.yml
     permissions:
       contents: read
@@ -156,7 +132,6 @@ jobs:
       push-image: true
 
   build-buildah-third-party-arm64:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-buildah.yml
     with:
       image-name: my-cool-project
@@ -164,7 +139,6 @@ jobs:
       push-image: false
 
   build-dual-buildah:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-dual-image-buildah.yml
     permissions:
       contents: read
@@ -174,7 +148,6 @@ jobs:
       push-image: true
 
   build-docker-arm64:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-docker.yml
     permissions:
       contents: read
@@ -187,7 +160,6 @@ jobs:
       tag-suffix: "-amd64"
 
   merge-with-artifact:
-    if: github.event_name == 'pull_request'
     needs: [ build-kaniko-amd64, build-docker-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
     permissions:
@@ -199,7 +171,6 @@ jobs:
       variant-digests: merge-digests
 
   merge-with-outputs:
-    if: github.event_name == 'pull_request'
     needs: [ build-kaniko-amd64, build-docker-arm64 ]
     uses: ./.github/workflows/merge-manifests.yml
     permissions:
@@ -213,7 +184,6 @@ jobs:
         ${{ needs.build-docker-arm64.outputs.digest }}
 
   build-kaniko-minimal-for-cleaning:
-    if: github.event_name == 'pull_request'
     uses: ./.github/workflows/build-image-kaniko.yml
     permissions:
       contents: read
@@ -224,7 +194,6 @@ jobs:
       push-image: true
 
   clean-package-versions:
-    if: github.event_name == 'pull_request'
     needs:
       - build-kaniko-minimal-for-cleaning
     uses: ./.github/workflows/clean.yml
@@ -259,7 +228,7 @@ jobs:
   clean:
     runs-on: ubuntu-24.04
     # Cleanup workflow isn't triggered in this case
-    if: github.event_name == 'pull_request' && github.head_ref == 'bump-version'
+    if: github.head_ref == 'bump-version'
     permissions:
       contents: read
       packages: write

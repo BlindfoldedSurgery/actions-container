@@ -1,0 +1,19 @@
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v5
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      build-tool: uv
+      publish-major-tag: true
+      python-version: "3.14"
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
