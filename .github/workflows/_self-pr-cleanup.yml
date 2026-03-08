@@ -1,3 +1,5 @@
+name: PR Cleanup
+
 on:
   workflow_dispatch:
     inputs:
