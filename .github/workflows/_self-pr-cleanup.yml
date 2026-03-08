@@ -23,10 +23,6 @@ jobs:
         variant:
           - buildah-cached
           - buildah-cached/layer-cache
-          - cached
-          - cached/layer-cache
-          - dual
-          - dual/layer-cache
           - dual-buildah/layer-cache
           - dual-buildah
           - for-cleaning
