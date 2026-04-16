@@ -14,7 +14,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "commitizen", specifier = "==4.13.10" },
-    { name = "pre-commit", specifier = ">=4.0.0,<5.0.0" },
+    { name = "pre-commit", specifier = "==4.5.1" },
 ]
 
 [[package]]
