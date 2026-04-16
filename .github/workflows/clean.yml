@@ -21,9 +21,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v5
+        uses: rlespinasse/github-slug-action@v5.6.0
       - name: Clean up old app container images
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@v5.0.0
         with:
           package-name: ${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}
           package-type: container
