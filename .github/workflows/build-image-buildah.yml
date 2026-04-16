@@ -67,14 +67,14 @@ jobs:
       image-name: ${{ steps.metadata.outputs.image-name }}
       image-tag: ${{ steps.metadata.outputs.image-tag }}
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           submodules: ${{ inputs.enable-submodules }}
       - name: Create empty Docker config
         # Workaround for podman login issue #41
         run: mkdir "$HOME/.docker"
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v5.6.0
+        uses: rlespinasse/github-slug-action@e6f261660910b273384c5c42b17a0217881b217a # v5.6.0
       - name: Extract image metadata
         id: metadata
         run: |
@@ -83,7 +83,7 @@ jobs:
           echo 'image-name=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}' >> "$GITHUB_OUTPUT"
           echo 'image-tag=${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}' >> "$GITHUB_OUTPUT"
       - name: Log in to GitHub Container Registry
-        uses: redhat-actions/podman-login@v1.7
+        uses: redhat-actions/podman-login@4934294ad0449894bcd1e9f191899d7292469603 # v1.7
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -109,6 +109,6 @@ jobs:
       - name: Push image
         if: inputs.push-image
         id: push
-        uses: redhat-actions/push-to-registry@v2.8
+        uses: redhat-actions/push-to-registry@5ed88d269cf581ea9ef6dd6806d01562096bee9c # v2.8
         with:
           tags: "${{ steps.metadata.outputs.image-name }}:${{ steps.metadata.outputs.image-tag }}"
