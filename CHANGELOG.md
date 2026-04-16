@@ -1,3 +1,10 @@
+## v8.0.1 (2026-04-16)
+
+### Fix
+
+- pin pre-commit
+- pin all ci deps
+
 ## v8.0.0 (2026-03-08)
 
 ### BREAKING CHANGE
