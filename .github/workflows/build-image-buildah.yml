@@ -83,7 +83,7 @@ jobs:
           echo 'image-name=ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ inputs.image-name || env.GITHUB_REPOSITORY_NAME_PART_SLUG }}' >> "$GITHUB_OUTPUT"
           echo 'image-tag=${{ inputs.version || github.sha }}${{ inputs.tag-suffix }}' >> "$GITHUB_OUTPUT"
       - name: Log in to GitHub Container Registry
-        uses: redhat-actions/podman-login@4934294ad0449894bcd1e9f191899d7292469603 # v1.7
+        uses: redhat-actions/podman-login@9184318aae1ee5034fbfbacc0388acf12669171f # v1.6
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
