@@ -4,7 +4,7 @@ requires-python = "==3.14.4"
 
 [[package]]
 name = "actions-container"
-version = "8.0.1"
+version = "8.0.2"
 source = { virtual = "." }
 dependencies = [
     { name = "commitizen" },
