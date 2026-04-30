@@ -13,6 +13,15 @@
         "major"
       ],
       "commitMessagePrefix": "feat(deps)!:"
+    },
+    {
+      "matchDepNames": [
+        "quay.io/containers/aio"
+      ],
+      "schedule": [
+        "* * 1 * *"
+      ],
+      "semanticCommitType": "fix"
     }
   ]
 }
