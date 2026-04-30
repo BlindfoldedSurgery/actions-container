@@ -1,7 +1,7 @@
 [project]
 name = "actions-container"
 description = "GitHub Actions Workflows for containers"
-version = "8.0.2"
+version = "8.0.3"
 authors = [
     { email = "team@blindfolded.surgery", name = "BlindfoldedSurgery" }
 ]
