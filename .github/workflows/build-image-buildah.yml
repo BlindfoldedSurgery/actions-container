@@ -58,7 +58,7 @@ jobs:
   build:
     runs-on: ${{ inputs.runner-name-build }}
     container:
-      image: quay.io/containers/aio:v2026.04.22
+      image: quay.io/containers/aio:v2026.04.29
       options: --security-opt seccomp=unconfined --security-opt label=disabled --privileged --device /dev/fuse:rw
     timeout-minutes: ${{ inputs.timeout-minutes }}
     outputs:
