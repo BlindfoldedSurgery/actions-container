@@ -1,3 +1,9 @@
+## v8.0.7 (2026-09-01)
+
+### Fix
+
+- **deps**: update quay.io/containers/aio docker tag to v2026.08.31
+
 ## v8.0.6 (2026-08-17)
 
 ### Fix
