@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   bump:
-    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v5
+    uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v6
     permissions:
       contents: write
       pull-requests: write
